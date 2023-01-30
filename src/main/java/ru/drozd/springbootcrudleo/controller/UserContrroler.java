@@ -1,35 +1,41 @@
 package ru.drozd.springbootcrudleo.controller;
 
 
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import ru.drozd.springbootcrudleo.DAO.UserDao;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.drozd.springbootcrudleo.model.User;
+import ru.drozd.springbootcrudleo.service.UserService;
 
+
+import javax.validation.Valid;
 
 @Controller
 public class UserContrroler {
 
-    private final UserDao userDao;
+
+    private final UserService userService;
 
     @Autowired
-    public UserContrroler(UserDao userDao) {
-        this.userDao = userDao;
+    public UserContrroler(UserService userService) {
+
+        this.userService = userService;
     }
 
     @GetMapping("/")
     public String getAllUsers(Model model) {
-        model.addAttribute("users",userDao.getAllUsers());
+        model.addAttribute("users",userService.getAllUsers());
         return "users";
     }
 
-    @GetMapping("/{id}")
-    public String showUser(@PathVariable("id") int id,Model model) {
-        model.addAttribute("user",userDao.getUserById(id));
+    @GetMapping("/show")
+    public String showUser(@RequestParam(value = "id") int id,Model model) {
+        model.addAttribute("user",userService.getUserById(id));
         return "user";
     }
 
@@ -43,29 +49,29 @@ public class UserContrroler {
         if (bindingResult.hasErrors()) {
             return "add_user";
         } else {
-            userDao.addUser(user);
+            userService.addUser(user);
             return "redirect:/";
         }
     }
 
-    @DeleteMapping("/delete/{id}")
-    public String delete(@PathVariable("id") int id) {
-        userDao.removeUser(id);
+    @PostMapping ("/delete")
+    public String delete(@RequestParam(value = "id") int id) {
+        userService.removeUser(id);
         return "redirect:/";
     }
 
-    @GetMapping("edit/{id}")
-    public String updateUser(@PathVariable("id") int id, Model model) {
-        model.addAttribute(userDao.getUserById(id));
+    @GetMapping("/edit")
+    public String updateUser(@RequestParam(value = "id") int id, Model model) {
+        model.addAttribute(userService.getUserById(id));
         return "edit";
     }
 
-    @PatchMapping("/edit")
+    @PostMapping("/edit")
     public String update(@Valid User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "edit";
         } else {
-            userDao.updateUser(user);
+            userService.updateUser(user);
             return "redirect:/";
         }
     }
