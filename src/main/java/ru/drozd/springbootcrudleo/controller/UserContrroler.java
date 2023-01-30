@@ -55,7 +55,7 @@ public class UserContrroler {
     }
 
     @PostMapping ("/delete")
-    public String delete(@RequestParam(value = "id") int id) {
+    public String deleteUser(@RequestParam(value = "id") int id) {
         userService.removeUser(id);
         return "redirect:/";
     }
